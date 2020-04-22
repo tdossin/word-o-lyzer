@@ -37,6 +37,7 @@
 			id="filterWords"
 			name="filterWords"
 			v-model="filterWords"
+			@keyup="filterKeyUp"
 		></textarea>
 		<br />
 		<span id="wordCount" v-if="wordCount">
@@ -69,7 +70,8 @@ export default {
 			text: "",
 			wordCount: null,
 			filterWords: ["we", "and"],
-			demoText: "farts we are and cool we",
+			demoText:
+				"This is just some demo text that you can add when you can't think of anything to write, like right now. Fart! This fart is not a fart very exciting fart.",
 			version: "1.0.5"
 		};
 	},
@@ -108,8 +110,6 @@ export default {
 		},
 		buildWordTable(text) {
 			console.time("building table");
-
-			console.log("text: ", text);
 
 			if (text.length == 0) {
 				text = this.text;
@@ -151,9 +151,21 @@ export default {
 		runWordOlyzer() {
 			// runs the methods based on what's in the <textarea>
 			var text = this.text;
+			// reset table
+			$("#wordObjectTable TBODY").html("");
 
 			this.getWordCount(text);
 			this.buildWordTable(text);
+		},
+		filterKeyUp() {
+			// hacky for dev only
+			var keyup = this;
+			setTimeout(function() {
+				var text = keyup.text;
+				$("#wordObjectTable TBODY").html("");
+				keyup.getWordCount(text);
+				keyup.buildWordTable(text);
+			}, 1500);
 		}
 	},
 	filters: {
@@ -179,7 +191,7 @@ export default {
 };
 </script>
 		
-<style scoped>
+<style>
 body {
 	font-family: "Courier New", Courier, monospace;
 	text-align: center;
