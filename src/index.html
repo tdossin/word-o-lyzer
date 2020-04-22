@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>word app project</title>
+    <style type="text/css">
+		body{font-family:'Courier New', Courier, monospace;text-align:center;}
+		#version{font-size:.7em;}
+		th{min-width:100px;}
+		td{padding: 3px;}
+		tbody tr:nth-child(odd){background-color:coral}
+		tbody tr:nth-child(even){background-color:lightblue}
+		label{font-size:.7em;}
+	</style>
+	<link rel="icon" type="image/png" href="/favicon.ico">
+	<!-- <link rel="stylesheet" type="text/html" href="/css/datatable.css" /> -->
+	<script src="main.js"></script>
+	<!-- run "live-server" at prompt -->
+</head>
+<body>
+	<div id="words-app">
+	  <!-- <h3>untitled word app project thingy <span id="version"></span></h3> -->
+	  <h1>I'm from /src/</h1>
+	  <div class="leftBox">
+		  <textarea id="toAnalyze" name="toAnalyze" placeholder="[type or paste text here with ctrl+v]" style="width:400px;height:200px;"></textarea> 
+	  </div>
+	  <div class="rightBox">
+			<button id="reset">Clear</button>
+			<button id="sample">+[demo data]</button>
+			<input id="fileInput" type='file' accept='text/plain' onchange='getFile(event)' style="width:150px;">	
+			<button id="punctuation">&lt; clean &gt;</button>
+	  </div>
+	  <br/>
+	  <button id="processButton" style="padding:20px 100px;border-radius:3px;">Word-o-lyze&reg; it!</button>
+	  <hr />
+	  <br/>
+	  <br/>
+	  <label>filter these words:</label><br/>
+	  <textarea id="filterWords" name="filterWords"></textarea>	  
+	  <br/>
+	  <span id="wordCount"></span>
+	  <br/>
+	  <span id="wordTable"></span>
+    </div>
+</body>
+</html>

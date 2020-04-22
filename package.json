@@ -1,0 +1,74 @@
+{
+  "name": "words",
+  "version": "1.0.0",
+  "private": true,
+  "description": "word counter and occurance processor",
+  "author": {
+    "name": "tdossin"
+  },
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@vue/cli": "^4.3.1",
+    "core-js": "^3.6.4",
+    "d3": "^5.16.0",
+    "datatable": "^2.0.2",
+    "jquery": "^3.5.0",
+    "lodash": "^4.17.15",
+    "mysql": "github:mysqljs/mysql",
+    "npx": "^10.2.2",
+    "prettier-eslint": "^9.0.1",
+    "uniq": "^1.0.1",
+    "vue": "^2.6.11"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "@vue/cli-plugin-babel": "~4.3.0",
+    "@vue/cli-plugin-eslint": "~4.3.0",
+    "@vue/cli-service": "~4.3.0",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "html-webpack-plugin": "^4.2.0",
+    "livereload-js": "^3.2.2",
+    "prettier": "2.0.5",
+    "vue-template-compiler": "^2.6.11",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {
+      "no-unused-vars": "off",
+      "no-unused-expression": "off",
+      "no-useless-escape": "off",
+      "no-prototype-builtins": "off"
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "_id": "words@1.0.0",
+  "license": "ISC",
+  "readme": "ERROR: No README data found!"
+}
