@@ -2,11 +2,11 @@
 	<div>
 		<h3>
 			untitled word app project thingy
-			<div src=""></div>
 			<span id="version"></span>
 		</h3>
 		<div class="leftBox">
 			<textarea
+				v-model="text"
 				id="toAnalyze"
 				name="toAnalyze"
 				placeholder="[type or paste text here with ctrl+v]"
@@ -14,30 +14,48 @@
 			></textarea>
 		</div>
 		<div class="rightBox">
-			<button id="reset">Clear</button>
-			<button id="sample">+[demo data]</button>
+			<button id="reset" @click="text = ''">Clear</button>
+			<button id="sample" @click="text += demoText">+[demo data]</button>
 			<input
 				id="fileInput"
 				type="file"
 				accept="text/plain"
-				onchange="getFile(event)"
+				@change="getFile($event)"
 				style="width: 150px;"
 			/>
-			<button id="punctuation">&lt; clean &gt;</button>
+			<button @click="removePunctuation">&lt; clean &gt;</button>
 		</div>
 		<br />
-		<button @click="getWordCount" class="bigButton">
+		<button @click="runWordOlyzer" class="bigButton">
 			Word-o-lyze&reg; it!
 		</button>
 		<hr />
 		<br />
 
 		<label>filter these words:</label><br />
-		<textarea id="filterWords" name="filterWords"></textarea>
+		<textarea
+			id="filterWords"
+			name="filterWords"
+			v-model="filterWords"
+		></textarea>
 		<br />
-		<span id="wordCount"></span>
+		<span id="wordCount" v-if="wordCount">
+			about
+			<span style="font-size: 2em; font-weight: bold;">{{ wordCount }}</span>
+			words
+		</span>
 		<br />
-		<span id="wordTable"></span>
+		<span id="wordTable">
+			<table id="wordObjectTable" style="margin: 30px auto;">
+				<thead>
+					<tr>
+						<th>word</th>
+						<th class="wordcount">count</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</span>
 	</div>
 </template>
 
@@ -48,176 +66,112 @@ export default {
 	name: "WordOLyzer",
 	data() {
 		return {
-			words: "one two three"
+			text: "",
+			wordCount: null,
+			filterWords: ["we", "and"],
+			demoText: "farts we are and cool we",
+			version: "1.0.5"
 		};
 	},
 	methods: {
-		doTheThing() {
-			console.log("aw farts");
-		},
-		getWordCount() {
-			console.log("yo i be processing...");
-
-			// get the text from the value of the textarea by ID
-			var rawText = $("#toAnalyze").val();
-			//console.log('rawText: ', rawText);	// DEV
-
+		getWordCount(words) {
 			// trim spaces on either side of string
-			var textTrimmed = rawText.trim();
-
+			var textTrimmed = words.trim();
 			// count the words by splitting them by spaces (hacky)
-			var wordCount = textTrimmed.split(" ").length;
-			//console.log('wordCount: ', wordCount);
-
-			return wordCount;
+			this.wordCount = textTrimmed.split(" ").length;
 		},
-		mounted() {
-			console.log("i m mounted yo");
+		removePunctuation(text) {
+			//remove punctuation
+			if (text.length == 0) {
+				text = this.text;
+			}
+			var punctuationFilter = text.replace(/[.,\/#!$%\^&\*;:{}—=\-_`~()]/g, "");
+			return punctuationFilter.replace(/\s{2,}/g, " ");
+		},
+		getFile(event) {
+			// reads local .txt files
+			var file = event.target.files[0];
+			var reader = new FileReader();
+			reader.onload = e => this.$emit((this.text = e.target.result));
+			reader.readAsText(file);
+		},
+		trimSpaces(text) {
+			var remSpacesOnFrontAndBack = text.trim();
+			var trimmed = remSpacesOnFrontAndBack.replace(/\s\s+/g, " ");
+			return trimmed;
+		},
+		words(array) {
+			return array.reduce(function(count, word) {
+				count[word] = count.hasOwnProperty(word) ? count[word] + 1 : 1;
+				return count;
+			}, {});
+		},
+		buildWordTable(text) {
+			console.time("building table");
 
-			//TODO: move all this shiz to methods
+			console.log("text: ", text);
 
-			var tableTemplate =
-				' \
-			<table id="wordObjectTable" style="margin:30px auto;">  \
-				<thead> \
-					<tr> \
-						<th>word</th> \
-						<th class="wordcount">count</th> \
-					</tr> \
-				</thead> \
-				<tbody></tbody> \
-			</table>';
-			var resetForm = function() {
-				//console.log('reset that form, yo')
-				$("#toAnalyze").val("");
-				$("#wordCount").html("");
-				$("#wordTable").html(tableTemplate);
-				var countedWordArray = [];
-				var wordArrayObject = {};
-			};
+			if (text.length == 0) {
+				text = this.text;
+			}
 
-			// get text from whitehouse.gov (eventually)
-			//var title = $('.page-content__content').text()
+			// trim spaces
+			var textTrimmed = this.trimSpaces(text);
 
-			// set the host URL to wherever we are being hosted
-			//var LOCAL = window.location.href;
+			// transform to lower case
+			var lowerCase = textTrimmed.toLowerCase(); // native JS
 
-			var trimSpaces = function(text) {
-				var remSpacesOnFrontAndBack = text.trim();
-				var trimmed = remSpacesOnFrontAndBack.replace(/\s\s+/g, " ");
-				return trimmed;
-			};
+			// remove punctuation
 
-			var filterShittyWords = function(word) {
-				var wordsToFilter = $("#filterWords").val();
-				return !wordsToFilter.includes(word);
-			};
+			var finalString = this.removePunctuation(lowerCase);
 
-			var removePunctuation = function(text) {
-				//remove punctuation
-				var punctuationFilter = text.replace(
-					/[.,\/#!$%\^&\*;:{}—=\-_`~()]/g,
-					""
+			// split into array
+			var finalStringArray = finalString.split(" ");
+
+			// filter out the words we don't want
+
+			var array = this.filterWords;
+			var filteredArray = finalStringArray.filter(function(word) {
+				return !array.includes(word);
+			});
+
+			// create word object
+			var wordObject = this.words(filteredArray);
+
+			// cycle through object and build table rows
+			for (var [key, value] of Object.entries(wordObject)) {
+				//console.log('not in there (so add it to the table)')
+				$("#wordObjectTable > TBODY").append(
+					"<tr><td>" + key + "</td><td>" + value + "</td></tr>"
 				);
-				var punctuationRemoved = punctuationFilter.replace(/\s{2,}/g, " ");
-				return punctuationRemoved;
-			};
+			}
 
-			var words = function(array) {
-				return array.reduce(function(count, word) {
-					count[word] = count.hasOwnProperty(word) ? count[word] + 1 : 1;
-					return count;
-				}, {});
-			};
+			console.timeEnd("building table");
+		},
+		runWordOlyzer() {
+			// runs the methods based on what's in the <textarea>
+			var text = this.text;
 
-			var getFile = function(event) {
-				// reads local .txt files
-				var input = event.target;
-				var reader = new FileReader();
-				reader.onload = function() {
-					var text = reader.result;
-					$("#toAnalyze").val(text);
-				};
-				reader.readAsText(input.files[0]);
-
-				// TODO ajax for cross-site file transfer
-				// $.ajax({
-				// 	method: "GET",
-				// 	url: LOCAL + 'data.txt',
-				// 	success: function(data){
-				// 		console.info('ok USA');
-				// 		// do some stuff with that data, yo!
-				// 	},
-				// 	error: function(response){
-				// 		console.error('whooomp:', response.statusText);
-				// 	},
-				// 	complete: function(response){
-				// 		console.warn('complete beep boop beep!');
-				// 		//console.log(response.statusText);
-				// 	}
-				// });
-			};
-
-			var buildWordTable = function() {
-				console.time("building table");
-				// reset table
-				$("#wordTable").html(tableTemplate);
-
-				// get the text from the value of the textarea by ID
-				var rawText = $("#toAnalyze").val();
-				//console.log('rawText: ', rawText);	// DEV
-
-				// trim spaces
-				var textTrimmed = trimSpaces(rawText);
-
-				// transform to lower case
-				var lowerCase = textTrimmed.toLowerCase();
-
-				// remove punctuation
-				var finalString = removePunctuation(lowerCase);
-
-				// split into array
-				var finalStringArray = finalString.split(" ");
-
-				// filter out the words we don't want
-				var filteredArray = finalStringArray.filter(filterShittyWords);
-
-				// create word object
-				var wordObject = words(filteredArray);
-
-				// cycle through object and build table rows
-				for (var [key, value] of Object.entries(wordObject)) {
-					//console.log('not in there (so add it to the table)')
-					$("#wordObjectTable > TBODY").append(
-						"<tr><td>" + key + "</td><td>" + value + "</td></tr>"
-					);
-				}
-
-				console.timeEnd("building table");
-
-				//init datatable jQuery plugin
-				$("#wordObjectTable").datatable({
-					sort: "*",
-					sortKey: 1,
-					sortDir: "desc",
-					pageSize: 500000
-				});
-
-				// hacky clicking headers:
-				$("table th.wordcount").trigger("click");
-				$("table th.wordcount").trigger("click");
-			};
-
-			var displayResults = function() {
-				$("#wordCount").html(
-					'about <span style="font-size:2em;font-weight:bold;">' +
-						"[getWordCount()]" +
-						"</span> words"
-				);
-
-				buildWordTable();
-			};
+			this.getWordCount(text);
+			this.buildWordTable(text);
 		}
+	},
+	filters: {
+		filterShittyWords(word) {
+			console.log("ok we he");
+			console.log("word: ", word);
+			var wordsToFilter = this.data.filterWords;
+			return !wordsToFilter.includes(word);
+		},
+		capitalize: function(text) {
+			return text.replace(/(?:^|\s)\S/g, function(a) {
+				return a.toUpperCase();
+			});
+		}
+	},
+	computed: {},
+	mounted() {
+		//console.log("i m mounted() yo");
 	},
 	props: {
 		msg: String
@@ -225,7 +179,6 @@ export default {
 };
 </script>
 		
-
 <style scoped>
 body {
 	font-family: "Courier New", Courier, monospace;
@@ -248,9 +201,5 @@ tbody tr:nth-child(even) {
 }
 label {
 	font-size: 0.7em;
-}
-.bigButton {
-	padding: 20px 100px;
-	border-radius: 3px;
 }
 </style>

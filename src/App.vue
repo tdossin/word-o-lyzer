@@ -1,28 +1,25 @@
 <template>
-  <div id="app">
-    <WordOLyzer/>
-  </div>
+	<div id="app">
+		<WordOLyzer />
+	</div>
 </template>
 
 <script>
-
-import WordOLyzer from './components/WordOLyzer.vue';
+import WordOLyzer from "./components/WordOLyzer.vue";
 
 export default {
-  name: 'App',
-  components: {
-    WordOLyzer
-  }
-}
+	name: "App",
+	components: {
+		WordOLyzer
+	}
+};
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+	font-family: "Courier New", Courier, monospace;
+	text-align: center;
+	color: #2c3e50;
+	margin-top: 60px;
 }
 </style>
