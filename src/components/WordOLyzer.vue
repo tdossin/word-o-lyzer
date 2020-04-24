@@ -10,8 +10,22 @@
 				id="toAnalyze"
 				name="toAnalyze"
 				placeholder="[type or paste text here with ctrl+v]"
-				style="width: 400px; height: 200px;"
-			></textarea>
+				style="width: 600px; height: 150px; display: block; margin: 0 auto;"
+				readonly
+			></textarea
+			><br />
+			<div class="looky-box">
+				{{ text | deCapitalize }}
+			</div>
+			<div class="looky-box">
+				{{ text | punkFilter }}
+			</div>
+			<div class="looky-box">
+				{{ text | arrayOlyzer }}
+			</div>
+			<div class="looky-box">
+				{{ text | deCapitalize }}
+			</div>
 		</div>
 		<div class="rightBox">
 			<button id="reset" @click="text = ''">Clear</button>
@@ -23,7 +37,6 @@
 				@change="getFile($event)"
 				style="width: 150px;"
 			/>
-			<button @click="removePunctuation">&lt; clean &gt;</button>
 		</div>
 		<br />
 		<button @click="runWordOlyzer" class="bigButton">
@@ -36,13 +49,13 @@
 		<textarea
 			id="filterWords"
 			name="filterWords"
-			v-model="filterWords"
-			@keyup="filterKeyUp"
+			v-model="boringWordsArray"
+			readonly
 		></textarea>
 		<br />
 		<span id="wordCount" v-if="wordCount">
 			about
-			<span style="font-size: 2em; font-weight: bold;">{{ wordCount }}</span>
+			<span>{{ wordCount }}</span>
 			words
 		</span>
 		<br />
@@ -62,33 +75,36 @@
 
 <script>
 import $ from "jquery";
+import _ from "lodash";
 
 export default {
 	name: "WordOLyzer",
 	data() {
 		return {
 			text: "",
-			wordCount: null,
-			filterWords: ["we", "and"],
+			wordCount: 0,
+			boringWordsArray: ["first", "of", "all"],
 			demoText:
-				"This is just some demo text that you can add when you can't think of anything to write, like right now. Fart! This fart is not a fart very exciting fart.",
-			version: "1.0.5"
+				"?!><F1RST...!. of all fart fart fart fart fart fart THIS IS AN ALLLLLL CAAAAPS MESSSSAAAAAAGE! ME SO ANGRY! demo text that you can add when you can't think of anything to write, like right now. Fart! This fart is not a fart very exciting fart."
 		};
 	},
 	methods: {
 		getWordCount(words) {
 			// trim spaces on either side of string
+			if (!words) return "";
 			var textTrimmed = words.trim();
 			// count the words by splitting them by spaces (hacky)
-			this.wordCount = textTrimmed.split(" ").length;
+			return textTrimmed.split(" ").length;
 		},
 		removePunctuation(text) {
 			//remove punctuation
 			if (text.length == 0) {
 				text = this.text;
 			}
-			var punctuationFilter = text.replace(/[.,\/#!$%\^&\*;:{}—=\-_`~()]/g, "");
-			return punctuationFilter.replace(/\s{2,}/g, " ");
+			var punctuationFilter = text
+				.toString()
+				.replace(/[.,\/#!$%\^&\*;:{}—=\-_`~()]/g, "");
+			return text.punctuationFilter.replace(/\s{2,}/g, " ").toString();
 		},
 		getFile(event) {
 			// reads local .txt files
@@ -97,65 +113,14 @@ export default {
 			reader.onload = e => this.$emit((this.text = e.target.result));
 			reader.readAsText(file);
 		},
-		trimSpaces(text) {
-			var remSpacesOnFrontAndBack = text.trim();
-			var trimmed = remSpacesOnFrontAndBack.replace(/\s\s+/g, " ");
-			return trimmed;
-		},
-		words(array) {
-			return array.reduce(function(count, word) {
-				count[word] = count.hasOwnProperty(word) ? count[word] + 1 : 1;
-				return count;
-			}, {});
-		},
-		buildWordTable(text) {
-			console.time("building table");
-
-			if (text.length == 0) {
-				text = this.text;
-			}
-
-			// trim spaces
-			var textTrimmed = this.trimSpaces(text);
-
-			// transform to lower case
-			var lowerCase = textTrimmed.toLowerCase(); // native JS
-
-			// remove punctuation
-
-			var finalString = this.removePunctuation(lowerCase);
-
-			// split into array
-			var finalStringArray = finalString.split(" ");
-
-			// filter out the words we don't want
-
-			var array = this.filterWords;
-			var filteredArray = finalStringArray.filter(function(word) {
-				return !array.includes(word);
-			});
-
-			// create word object
-			var wordObject = this.words(filteredArray);
-
-			// cycle through object and build table rows
-			for (var [key, value] of Object.entries(wordObject)) {
-				//console.log('not in there (so add it to the table)')
-				$("#wordObjectTable > TBODY").append(
-					"<tr><td>" + key + "</td><td>" + value + "</td></tr>"
-				);
-			}
-
-			console.timeEnd("building table");
-		},
 		runWordOlyzer() {
-			// runs the methods based on what's in the <textarea>
+			// starts the whole sha-bang
 			var text = this.text;
 			// reset table
 			$("#wordObjectTable TBODY").html("");
 
 			this.getWordCount(text);
-			this.buildWordTable(text);
+			//this.processText(text);
 		},
 		filterKeyUp() {
 			// hacky for dev only
@@ -164,24 +129,57 @@ export default {
 				var text = keyup.text;
 				$("#wordObjectTable TBODY").html("");
 				keyup.getWordCount(text);
-				keyup.buildWordTable(text);
+				//keyup.processText(text);
 			}, 1500);
 		}
 	},
 	filters: {
-		filterShittyWords(word) {
-			console.log("ok we he");
-			console.log("word: ", word);
-			var wordsToFilter = this.data.filterWords;
-			return !wordsToFilter.includes(word);
+		punkFilter(punkyText) {
+			// remove punKtuation LMAO
+			if (!punkyText) return "";
+
+			var punctuationFilter = punkyText
+				.toString()
+				.replace(/[.,\/#!$%\^&\*;:{}—=\-_`~()]/g, "");
+			return punctuationFilter.replace(/\s{2,}/g, " ").toString();
 		},
-		capitalize: function(text) {
-			return text.replace(/(?:^|\s)\S/g, function(a) {
-				return a.toUpperCase();
-			});
+		deCapitalize(cappyText) {
+			return cappyText.toLowerCase();
+		},
+		arrayOlyzer(stringyText) {
+			//if (!stringyText) return [];
+			return stringyText.split(" ");
 		}
 	},
-	computed: {},
+	computed: {
+		findTheDiff(a1, a2) {
+			// filter out [a2] from [a1]
+			//return arr1.filter(x => arr2.includes(x)); //<------maybe when we integrate ES2015?
+			//return _(arr1).difference(arr2); // lodash magic
+
+			// clunky but works
+			var a = [],
+				diff = [];
+
+			for (var i = 0; i < a1.length; i++) {
+				a[a1[i]] = true;
+			}
+			console.log("a2: ", a2);
+			for (var j = 0; j < a2.length; j++) {
+				if (a[a2[i]]) {
+					delete a[a2[i]];
+				} else {
+					a[a2[i]] = true;
+				}
+			}
+
+			for (var k in a) {
+				diff.push(k);
+			}
+			// set text to display as the returned array
+			return diff;
+		}
+	},
 	mounted() {
 		//console.log("i m mounted() yo");
 	},
@@ -191,7 +189,7 @@ export default {
 };
 </script>
 		
-<style>
+<style lang="scss">
 body {
 	font-family: "Courier New", Courier, monospace;
 	text-align: center;
@@ -213,5 +211,20 @@ tbody tr:nth-child(even) {
 }
 label {
 	font-size: 0.7em;
+}
+#wordcount > SPAN {
+	font-size: 2em;
+	font-weight: bold;
+}
+.looky-box {
+	width: 100px;
+	height: 100px;
+	overflow: hidden;
+	font-size: 0.75em;
+	display: inline-block;
+	margin: 10px;
+	padding: 20px;
+	text-justify: none;
+	$border: 1px dashed navy;
 }
 </style>
