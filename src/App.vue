@@ -6,8 +6,6 @@
 
 <script>
 import WordOLyzer from "./components/WordOLyzer.vue";
-import $ from "jquery";
-import _ from "lodash";
 
 export default {
 	name: "App",

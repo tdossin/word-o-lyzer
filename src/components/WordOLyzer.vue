@@ -6,40 +6,49 @@
 		</h3>
 		<div class="leftBox">
 			<textarea
-				v-model="text"
+				v-model="rawInputText"
 				id="toAnalyze"
 				name="toAnalyze"
 				placeholder="[type or paste text here with ctrl+v]"
 				style="width: 600px; height: 150px; display: block; margin: 0 auto;"
 				readonly
+				trim
 			></textarea
 			><br />
+			<div class="rightBox">
+				<button id="reset" @click="rawInputText = ''">Clear</button>
+				<button id="sample" @click="rawInputText += demoText">
+					+[demo data]
+				</button>
+				<input
+					id="fileInput"
+					type="file"
+					accept="text/plain"
+					@change="getFile($event)"
+					style="width: 150px;"
+				/>
+			</div>
+			<br />
 			<div class="looky-box">
-				{{ text | deCapitalize }}
+				<label>decapicalize</label>
+				{{ rawInputText | deCapitalize }}
 			</div>
 			<div class="looky-box">
-				{{ text | punkFilter }}
+				<label>removePunctuation</label>
+				{{ rawInputText | removePunctuation }}
 			</div>
 			<div class="looky-box">
-				{{ text | arrayOlyzer }}
+				<label>arrayOlyzer</label>
+				{{ rawInputText | arrayOlyzer }}
 			</div>
 			<div class="looky-box">
-				{{ text | deCapitalize }}
+				<label>arrayOlyzer</label>
+				{{ rawInputText | arrayOlyzer }}
 			</div>
 		</div>
-		<div class="rightBox">
-			<button id="reset" @click="text = ''">Clear</button>
-			<button id="sample" @click="text += demoText">+[demo data]</button>
-			<input
-				id="fileInput"
-				type="file"
-				accept="text/plain"
-				@change="getFile($event)"
-				style="width: 150px;"
-			/>
-		</div>
+
 		<br />
-		<button @click="runWordOlyzer" class="bigButton">
+		<button class="bigButton" disabled>
 			Word-o-lyze&reg; it!
 		</button>
 		<hr />
@@ -53,18 +62,19 @@
 			readonly
 		></textarea>
 		<br />
-		<span id="wordCount" v-if="wordCount">
+		<span id="wordCount">
 			about
-			<span>{{ wordCount }}</span>
-			words
+			<p>--------------[rawInputText | arrayOlyzer]----------------</p>
+			{{ rawInputText | arrayOlyzer }}
+			words in
 		</span>
 		<br />
-		<span id="wordTable">
+		<span id="wordTable" style="display: none;">
 			<table id="wordObjectTable" style="margin: 30px auto;">
 				<thead>
 					<tr>
 						<th>word</th>
-						<th class="wordcount">count</th>
+						<th>count</th>
 					</tr>
 				</thead>
 				<tbody></tbody>
@@ -74,110 +84,80 @@
 </template>
 
 <script>
-import $ from "jquery";
-import _ from "lodash";
-
 export default {
 	name: "WordOLyzer",
 	data() {
 		return {
-			text: "",
-			wordCount: 0,
-			boringWordsArray: ["first", "of", "all"],
+			rawInputText: new String(), // set to empty string
+			array: new Array(),
+			boringWordsArray: ["fart", "of", "all"],
+			excitingWordsArray: new Array(),
 			demoText:
-				"?!><F1RST...!. of all fart fart fart fart fart fart THIS IS AN ALLLLLL CAAAAPS MESSSSAAAAAAGE! ME SO ANGRY! demo text that you can add when you can't think of anything to write, like right now. Fart! This fart is not a fart very exciting fart."
+				"?!><F1RST..first FIRST fIrSt FiRsT.!. of all fart fart fart fart fart fart THIS IS AN ALLLLLL CAAAAPS MESSSSAAAAAAGE! ME SO ANGRY! demo text that you can add when you can't think of anything to write, like right now. Fart! This fart is not a fart very exciting fart."
 		};
 	},
 	methods: {
-		getWordCount(words) {
-			// trim spaces on either side of string
-			if (!words) return "";
-			var textTrimmed = words.trim();
-			// count the words by splitting them by spaces (hacky)
-			return textTrimmed.split(" ").length;
-		},
-		removePunctuation(text) {
-			//remove punctuation
-			if (text.length == 0) {
-				text = this.text;
-			}
-			var punctuationFilter = text
-				.toString()
-				.replace(/[.,\/#!$%\^&\*;:{}—=\-_`~()]/g, "");
-			return text.punctuationFilter.replace(/\s{2,}/g, " ").toString();
-		},
 		getFile(event) {
 			// reads local .txt files
 			var file = event.target.files[0];
 			var reader = new FileReader();
 			reader.onload = e => this.$emit((this.text = e.target.result));
 			reader.readAsText(file);
-		},
-		runWordOlyzer() {
-			// starts the whole sha-bang
-			var text = this.text;
-			// reset table
-			$("#wordObjectTable TBODY").html("");
-
-			this.getWordCount(text);
-			//this.processText(text);
-		},
-		filterKeyUp() {
-			// hacky for dev only
-			var keyup = this;
-			setTimeout(function() {
-				var text = keyup.text;
-				$("#wordObjectTable TBODY").html("");
-				keyup.getWordCount(text);
-				//keyup.processText(text);
-			}, 1500);
 		}
 	},
 	filters: {
-		punkFilter(punkyText) {
-			// remove punKtuation LMAO
-			if (!punkyText) return "";
-
-			var punctuationFilter = punkyText
-				.toString()
-				.replace(/[.,\/#!$%\^&\*;:{}—=\-_`~()]/g, "");
-			return punctuationFilter.replace(/\s{2,}/g, " ").toString();
+		removePunctuation(text) {
+			//remove punctuation
+			try {
+				let punctuationFilter = text.replace(
+					/[.,\/#!$%\^&\*;:{}—=\-_`~()]/g,
+					""
+				);
+				let returned = text.replace(/\s{2,}/g, " ");
+				return returned.toString();
+			} catch (error) {
+				console.log("fail.", error);
+				return;
+			}
 		},
-		deCapitalize(cappyText) {
-			return cappyText.toLowerCase();
+		deCapitalize(text) {
+			return text.toLowerCase();
 		},
-		arrayOlyzer(stringyText) {
-			//if (!stringyText) return [];
-			return stringyText.split(" ");
+		arrayOlyzer(text) {
+			if (!text) return new Array();
+			return new Array(text.split(" "));
 		}
 	},
 	computed: {
-		findTheDiff(a1, a2) {
-			// filter out [a2] from [a1]
-			//return arr1.filter(x => arr2.includes(x)); //<------maybe when we integrate ES2015?
-			//return _(arr1).difference(arr2); // lodash magic
+		boringFilter(rawInputText, boringWordsArray) {
+			// filter out [boringWordsArray] from [text]
+			let array1 = rawInputText.arrayOlyzer();
+			let array2 = this.boringWordsArray;
 
-			// clunky but works
-			var a = [],
-				diff = [];
+			if (array1.length != 0) {
+				var tempArr = array2.filter(function(item) {
+					return !array1.includes(item);
+				});
+				array1 = array1.filter(function(item) {
+					return !array2.includes(item);
+				});
+				array2 = tempArr;
+				// if you touch anything above here you are doing it wrong......
+				return new Array().array2;
+			} else {
+				// return empty array if error to keep all data working blah blah
+				return new Array();
+			}
+		},
+		wordCount(string) {
+			// count the words by splitting them by spaces (hacky)
 
-			for (var i = 0; i < a1.length; i++) {
-				a[a1[i]] = true;
+			if (!string.length != 0) {
+				//console.warn("ain got no straaaaaaang");
+				return [];
+			} else {
+				return string.split(" ");
 			}
-			console.log("a2: ", a2);
-			for (var j = 0; j < a2.length; j++) {
-				if (a[a2[i]]) {
-					delete a[a2[i]];
-				} else {
-					a[a2[i]] = true;
-				}
-			}
-
-			for (var k in a) {
-				diff.push(k);
-			}
-			// set text to display as the returned array
-			return diff;
 		}
 	},
 	mounted() {
@@ -216,6 +196,14 @@ label {
 	font-size: 2em;
 	font-weight: bold;
 }
+.looky-box > label {
+	background-color: rgba(255, 127, 80, 0.5);
+	color: #000;
+	position: relative;
+	top: -10px;
+	left: 0;
+	padding: 1px;
+}
 .looky-box {
 	width: 100px;
 	height: 100px;
@@ -223,7 +211,7 @@ label {
 	font-size: 0.75em;
 	display: inline-block;
 	margin: 10px;
-	padding: 20px;
+	padding: 10px;
 	text-justify: none;
 	$border: 1px dashed navy;
 }

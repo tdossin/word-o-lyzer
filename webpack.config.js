@@ -12,9 +12,6 @@ const config = {
         filename: 'main.js'
     },
     plugins: [
-        new HtmlWebpackPlugin({
-            filename: 'DELETEMEandthisotherJokeroverhere.html'
-        }),
         new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery"
