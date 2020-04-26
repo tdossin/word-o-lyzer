@@ -1,6 +1,6 @@
 {
   "name": "word-o-lyzer",
-  "version": "1.0.6",
+  "version": "1.1",
   "private": false,
   "description": "word counter and occurance processor",
   "author": {
@@ -22,6 +22,7 @@
     "mysql": "github:mysqljs/mysql",
     "npx": "^10.2.2",
     "prettier-eslint": "^9.0.1",
+    "python": "0.0.4",
     "sass": "^1.26.3",
     "uniq": "^1.0.1",
     "vue": "^2.6.11"
@@ -35,7 +36,7 @@
     "@vue/cli-service": "~4.3.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
-    "css-loader": "^3.5.2",
+    "css-loader": "^3.5.3",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
     "html-webpack-plugin": "^4.2.0",

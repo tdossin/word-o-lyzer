@@ -17,7 +17,7 @@
 			><br />
 			<div class="rightBox">
 				<button id="reset" @click="rawInputText = ''">Clear</button>
-				<button id="sample" @click="rawInputText += demoText">
+				<button id="sample" @click="addDemoText()">
 					+[demo data]
 				</button>
 				<input
@@ -89,7 +89,7 @@ export default {
 	data() {
 		return {
 			rawInputText: new String(), // set to empty string
-			array: new Array(),
+			array: null,
 			boringWordsArray: ["fart", "of", "all"],
 			excitingWordsArray: new Array(),
 			demoText:
@@ -103,6 +103,10 @@ export default {
 			var reader = new FileReader();
 			reader.onload = e => this.$emit((this.text = e.target.result));
 			reader.readAsText(file);
+		},
+		addDemoText(rawInputText, demoText) {
+			//console.warn("addDemoText()");
+			this.rawInputText += this.demoText;
 		}
 	},
 	filters: {
@@ -116,7 +120,7 @@ export default {
 				let returned = text.replace(/\s{2,}/g, " ");
 				return returned.toString();
 			} catch (error) {
-				console.log("fail.", error);
+				console.log("removePunctuation() fail.", error);
 				return;
 			}
 		},
@@ -162,6 +166,9 @@ export default {
 	},
 	mounted() {
 		//console.log("i m mounted() yo");
+
+		// adding demo text
+		this.rawInputText += this.demoText; // DEV
 	},
 	props: {
 		msg: String
