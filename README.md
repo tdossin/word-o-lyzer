@@ -1,4 +1,4 @@
-# words2
+# word-o-lyzer
 
 The goal here is to create a text analyzer that is capable of taking in text and transforming it into graphs and visualizations that make it easy to understand and see patterns within.
 
