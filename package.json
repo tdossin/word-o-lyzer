@@ -1,6 +1,6 @@
 {
   "name": "word-o-lyzer",
-  "version": "1.1",
+  "version": "1.1.0",
   "private": false,
   "description": "word counter and occurance processor",
   "author": {
@@ -79,7 +79,7 @@
     "last 2 versions",
     "not dead"
   ],
-  "_id": "words@1.0.0",
+  "_id": "words@1.1.0",
   "license": "ISC",
   "readme": "ERROR: No README data found!"
 }

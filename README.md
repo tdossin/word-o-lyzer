@@ -54,6 +54,43 @@ v. 1.1
 // LOOK@
 - cron jobs?
 - NODE.js?
+- Linux?
 - Do I need a DB?
 
+//
+Builds clean in development with 
+::npm run serve
+
+Builds clean for /dist/ with 
+::npm run build
+
+
+
+### Sand Box ###
+
+
+
+- README.md files, how do they work?
+
+- ctrl-F/Ctrl-r all the "fart" console.logs [lol] for 1.0.11?
+
+- visions for word-o-lyzer
+    - is it a 'plugin'?
+    - what are the goals
+        - White House Press Conference CV-19 B.I.N.G.O.
+            - tracker
+                - Google Sheets
+            - card maker
+            - player
+            - data gathering
+        - data visualization
+        - provide as a tool
+    - input>:[word-o-lyzer]:=output
+
+
+
+  
+    - take a minute to learn or    have an hour to burn&copy 2020
+     
+free play space...reallly explooore the file. jk
 
